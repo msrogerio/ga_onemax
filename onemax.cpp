@@ -10,14 +10,14 @@
     AUTHOR: Marlon da Silva Rogério
     DATA: 25 ABR 2021
     DISCIPLINA: Tópicos Especiais em Inteligência Computacional 
-    DESCRICAO: Agoritmos Genéticos | Onemax | Minização
+    DESCRICAO: Agoritmos Genéticos | Onemax | Mimização
 ***/
 
 using namespace std;
 
-long geracoes = 20; //numero de geracoes
-const int tam_pop = 50; //tamanho da populacao
-const int dimensoes_var=20; //numero de variaveis de decisao
+long geracoes = 100; //numero de geracoes
+const int tam_pop = 100; //tamanho da populacao
+const int dimensoes_var=100; //numero de variaveis de decisao
 const int dimensoes_obj=1; //numero de objetivos
 const double prob_mutacao=0.3; //probabilidade de mutacao
 struct Individuo {
@@ -88,6 +88,7 @@ int main(const int argc, const char* argv[]){
     cout << endl;
 }
 
+
 void inicializacao(){
     for(int i=0; i < tam_pop; i++ ){
         Individuo ind;
@@ -102,6 +103,7 @@ void inicializacao(){
     }
 }
 
+
 void aptidao(Individuo *ind){
     ind->fx[0]=0;
     for(int j=0;j<dimensoes_var;j++){
@@ -110,34 +112,51 @@ void aptidao(Individuo *ind){
     }
 }
 
+
 void selecao(Individuo *ind, Individuo *populacao){ //torneio binario
-    int tam_torneio = 5;
-    Individuo ind_qualquer = populacao[rand() % tam_pop + 1];
+    int tam_torneio = 7;
+    int indice_ind1 = rand()%tam_pop;
+    int indice_ind2;
+    Individuo ind_1 = populacao[indice_ind1];
+    Individuo ind_2;
+    do {
+        indice_ind2 = rand()%tam_pop;
+    }while (indice_ind1 == indice_ind2);
+    ind_2 = populacao[indice_ind2];
     for(int i = 0; i < tam_torneio; i++){
-        if (ind->fx[0] < ind_qualquer.fx[0])
-            *ind = ind_qualquer;
+        if (ind_1.fx[0] > ind_2.fx[0]){
+            memcpy(ind, &ind_2, sizeof(Individuo));
+        }else{
+            memcpy(ind, &ind_1, sizeof(Individuo));
+        }
     } 
 }
 
+
 void cruzamento(Individuo *filho1, Individuo *filho2, Individuo *pai1, Individuo *pai2){ //cruzamento uniforme
-    double valor_aleatorio = ((double) rand()/((double)RAND_MAX +1));
+    double valor_aleatorio = ((double) rand()/((double)RAND_MAX));
     double prob_cruzamento = 0.5;
     for (int i=0; i < dimensoes_var; i++){
-        if (prob_cruzamento >= valor_aleatorio )
+        if (prob_cruzamento > valor_aleatorio ){
+            filho1->x[i] = pai1->x[i];
+            filho2->x[i] = pai2->x[i];
+        }
+    }
+    for (int i=0; i < dimensoes_var; i++){
+        if (prob_cruzamento > valor_aleatorio ){
             filho1->x[i] = pai2->x[i];
             filho2->x[i] = pai1->x[i];
-    }
-}
-
-void mutacao(Individuo *ind){ 
-    double valor_aleatorio = ((double) rand()/(double)RAND_MAX + 1);
-    for(int i=0; i<=dimensoes_var; i++){
-        if (valor_aleatorio < prob_mutacao){     
-            if (ind->x[i] == 0)
-                ind->x[i] = 1;
-            else
-                ind->x[0] = 0;
         }
     }
 }
 
+
+void mutacao(Individuo *ind){ 
+    int x = rand()%dimensoes_var;
+    double valor_aleatorio = ((double) rand()/(double)RAND_MAX);
+    if (valor_aleatorio < prob_mutacao){     
+        if (ind->x[x] == 0){
+            ind->x[x]=1;
+        }
+    }
+}
